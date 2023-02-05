@@ -7,7 +7,7 @@ List<String> words = [
   "ok Tested",
   "Failed Error as Expected",
   "Unexpected Succcess 404",
-  "The Column and Row widgets are very important widgets for building UI in the Flutter app. While you develop your app and add multiple widgets inside the Column and Row, you may find that there is no space added between the widgets. But you may want to add some space between the children to make your app design look better. So in this tutorial, we’ll see the top 4 ways to add space between widgets in Flutter with Column and Row example."
+  // "The Column and Row widgets are very important widgets for building UI in the Flutter app. While you develop your app and add multiple widgets inside the Column and Row, you may find that there is no space added between the widgets. But you may want to add some space between the children to make your app design look better. So in this tutorial, we’ll see the top 4 ways to add space between widgets in Flutter with Column and Row example."
 ];
 String display = words[Random().nextInt(words.length)], ans = '';
 List<String> seperated = display.split(' ');
@@ -18,9 +18,11 @@ int correct = 0,
     flag = 2,
     index = 0,
     si = 0,
+    ei = 0,
     counter = 0,
     prevtemp = 0,
-    maxlen = seperated[1].length;
+    maxlen = seperated[1].length,
+    sep_count = 0;
 double accuracy = 0;
 final myController = TextEditingController();
 void cleartext() {
@@ -30,10 +32,9 @@ void cleartext() {
 //Color Scheme Function
 List<InlineSpan>? selector(int flagy, String a, int i) {
   List<InlineSpan> inny = [];
-  int ei = 0, k = si;
+  int k = si;
   while (display[k] != " " && k + 1 <= display.length) {
     if (k + 1 == display.length) {
-      print("Ei Founded Finallly ${k} ");
       ei = k + 1;
       break;
     } else if (display[k + 1] == " ") {
@@ -67,8 +68,6 @@ List<InlineSpan>? selector(int flagy, String a, int i) {
   }
   //----------------------------------------------------------
   if (si <= i && i < ei) {
-    print(si);
-    print(ei);
     //Color scheme for True string
     if (flagy == 1) {
       for (int l = 0; l < a.length; l++) {
@@ -111,7 +110,7 @@ List<InlineSpan>? selector(int flagy, String a, int i) {
       }
       return inny;
     }
-    //Color scheme for next string
+    //Color scheme for new string
     if (flagy == 2 && i == 0) {
       for (int l = 0; l < a.length; l++) {
         if (l == 0)
@@ -192,10 +191,9 @@ class SentenceState extends State<Sentence> {
                   ],
                   controller: myController,
                   onChanged: (values) => {
+                    //Flag System for Color code to display 
                     temp = values.length,
                     counter = values.length + prevtemp,
-                    print("Counter value :${counter}"),
-                    print("temp value :${temp}"),
                     if (display[counter - 1] == values[temp - 1] &&
                         display[counter - 1] != ' ')
                       {
@@ -206,37 +204,62 @@ class SentenceState extends State<Sentence> {
                       {
                         setState(() => {flag = 0, index = counter - 1})
                       },
-                    // if(counter-prevtemp==(eI-si)+1){
-                    //   print("c-prev == ${counter-prevtemp}"),
-                    //   print("si-eI===${si-eI}"),
-                    //     if(values.trim()==seperated[sep_count]){
-                    //       setState(() => {
-                    //       correct++,
-                    //       sep_count++,
-                    //       accuracy = double.parse((correct / (correct + wrong) * 100).toStringAsFixed(3)),},)
-                    //     }
-                    //     else{
-                    //       setState(() => {
-                    //       wrong++,
-                    //       sep_count++,
-                    //       accuracy = double.parse((correct / (correct + wrong) * 100).toStringAsFixed(3)),},)
-                    //     }
-                    // },
+                    //Comparing Single Words
+                    if(counter-prevtemp==(ei-si+1) && values[ei-si]==' '){
+                        if(values.trim()==seperated[sep_count]){
+                          print(values),
+                          setState(() => {
+                          correct++,
+                          sep_count++,
+                          accuracy = double.parse((correct / (correct + wrong) * 100).toStringAsFixed(3)),},)
+                        }
+                        else{
+                          print(values),
+                          setState(() => {
+                          wrong++,
+                          sep_count++,
+                          accuracy = double.parse((correct / (correct + wrong) * 100).toStringAsFixed(3)),},)
+                        }
+                    },
+                    // Reseting Whole State
                     if (counter == display.length)
                       {
+                         if (values.trim() == seperated[(seperated.length)-1])
+                          {
+                            setState(
+                              () => {
+                                correct++,
+                                accuracy = double.parse(
+                                    (correct / (correct + wrong) * 100)
+                                        .toStringAsFixed(3)),
+                              },
+                            )
+                          }
+                        else
+                          {setState(
+                              () => {
+                                wrong++,
+                                accuracy = double.parse(
+                                    (correct / (correct + wrong) * 100)
+                                        .toStringAsFixed(3)),
+                              },
+                            )},
                         setState(
                           () => {
+                            display = words[Random().nextInt(words.length)],
+                            seperated = display.split(' '),    
                             flag = 2,
                             index = 0,
                             si = 0,
+                            ei =0,
                             prevtemp = 0,
                             counter = 0,
+                            sep_count=0,
                             cleartext(),
-                            display = words[Random().nextInt(words.length)],
-                            print("${counter}")
                           },
-                        )
+                        ),
                       }
+                    //just Reseting Whole TextField 
                     else if (values[temp - 1] == " " &&
                         values[temp - 1] == display[counter - 1])
                       {
@@ -247,7 +270,6 @@ class SentenceState extends State<Sentence> {
                                   flag = 3,
                                   cleartext(),
                                   prevtemp = prevtemp + values.length,
-                                  print("prevtemp ${prevtemp}")
                                 }
                             })
                       },
